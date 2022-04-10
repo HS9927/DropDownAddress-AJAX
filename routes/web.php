@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,4 +19,5 @@ Route::get('/', function () {
 });
 
 Route::get("/", [\App\Http\Controllers\AddressController::class, "index"])->name("index");
-Route::get("/fetch/", [\App\Http\Controllers\AddressController::class, "city_fetch"])->name("address.fetch");
+Route::get("/fetch/", [\App\Http\Controllers\AddressController::class, "district_fetch"])->name("district.fetch");
+Route::get("/fetch/commune/", [\App\Http\Controllers\AddressController::class, "commune_fetch"])->name("commune.fetch");
