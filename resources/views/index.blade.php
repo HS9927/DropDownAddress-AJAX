@@ -21,7 +21,8 @@
                     <option>-- Select City --</option>
                     @foreach ($cities as $item)
                         <option value="{{ $item->province_code }}"
-                            {{ $item->province_code == ($add1_city ?? null) ? 'selected' : '' }}>{{ $item->province_name_en }}
+                            {{ $item->province_code == ($add1_city ?? null) ? 'selected' : '' }}>
+                            {{ $item->province_name_en }}
                         </option>
                     @endforeach
                 </select>
@@ -31,7 +32,9 @@
                 <input type="hidden" id="hidden_add1_district_code" value="{{ $add1_district ?? null }}">
                 <label>District</label>
                 <select id="f_district" class="form-control form-control-sm">
-                    {{-- <option value="" disabled>--- Select District ---</option> --}}
+                    @foreach (($districts ?? []) as $item)
+                        <option value="{{ $item->district_code }}" {{ ($add1_district ?? null) == $item->district_code ? "selected" : "" }} >{{ $item->district_name_en }}</option>
+                    @endforeach
                 </select>
             </div>
 
@@ -39,19 +42,22 @@
                 <input type="hidden" id="hidden_add1_commune_code" value="{{ $add1_commune ?? null }}">
                 <label>Commune</label>
                 <select id="f_commune" class="form-control form-control-sm">
-                    {{-- <option value="" disabled>--- Select Commune ---</option> --}}
+                    @foreach (($communes ?? []) as $item)
+                    <option value="{{ $item->commune_code }}" {{ ($add1_commune ?? null) == $item->commune_code ? "selected" : "" }}>{{ $item->commune_name_en }}</option>
+                    @endforeach
                 </select>
             </div>
         </div>
 
-        <div id="add2" style="display: none">
+        <div id="add2">
             <div class="form-group">
                 <label>City</label>
                 <select id="f_city" class="form-control form-control-sm">
                     <option>-- Select City --</option>
                     @foreach ($cities as $item)
                         <option value="{{ $item->province_code }}"
-                            {{ $item->province_code == ($add2_city ?? null) ? 'selected' : '' }}>{{ $item->province_name_en }}
+                            {{ $item->province_code == ($add2_city ?? null) ? 'selected' : '' }}>
+                            {{ $item->province_name_en }}
                         </option>
                     @endforeach
                 </select>
@@ -60,13 +66,21 @@
             <div class="form-group">
                 <input type="hidden" id="hidden_add2_district_code" value="{{ $add2_district ?? null }}">
                 <label>District</label>
-                <select id="f_district" class="form-control form-control-sm"></select>
+                <select id="f_district" class="form-control form-control-sm">
+                    @foreach (($districts2 ?? []) as $item)
+                        <option value="{{ $item->district_code }}" {{ ($add2_district ?? null) == $item->district_code ? "selected" : "" }} >{{ $item->district_name_en }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="form-group">
-                <input type="" id="hidden_add2_commune_code" value="{{ $add2_commune ?? null }}">
+                <input type="hidden" id="hidden_add2_commune_code" value="{{ $add2_commune ?? null }}">
                 <label>Commune</label>
-                <select id="f_commune" class="form-control form-control-sm"></select>
+                <select id="f_commune" class="form-control form-control-sm">
+                    @foreach (($communes2 ?? []) as $item)
+                    <option value="{{ $item->commune_code }}" {{ ($add2_commune ?? null) == $item->commune_code ? "selected" : "" }}>{{ $item->commune_name_en }}</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
@@ -79,7 +93,8 @@
     <script>
         /// Token for Ajax
         let _token = $('input[name="_token"]').val();
-        let userNotEdit = 0;
+        let cityChanged = 0;
+        let districtChanged = 0;
 
         /// Function Fetch District from Server using Ajax.
         function district_fetch(cityCode, superDiv, token) {
@@ -100,7 +115,6 @@
                             ">" + e
                             .district_name_en + "</option>");
                     });
-                    
                 },
                 error: function(response) {
                     console.error("Not Working !");
@@ -161,8 +175,9 @@
                     district_fetch(cityCode, e, _token);
                 });
             });
-            userNotEdit++;
+            cityChanged++;
         });
+        console.log("🚀 ~ file: index.blade.php ~ line 166 ~ $ ~ cityChanged : ", cityChanged)
 
         /// Fetch Commune in Page Create
         $(document).ready(function() {
@@ -173,49 +188,52 @@
                     commune_fetch(cityCode, e, _token);
                 });
             });
+            districtChanged++;
         });
+        console.log("🚀 ~ file: index.blade.php ~ line 179 ~ $ ~ districtChanged : ", districtChanged);
 
-        /// Fetch Distritct in Page Edit.
-        $(document).ready(function() {
-            const arrAddress = ["add1", "add2"];
-            let startMouseMove = 0;
-            arrAddress.forEach(function(e) {
-                /// Send data to Select Tag
-                let cityCode = $("#" + e + " #f_city").val();
-                district_fetch(cityCode, e, _token);
+        // /// Fetch Distritct in Page Edit.
+        // $(document).ready(function() {
+        //     const arrAddress = ["add1", "add2"];
+        //     let startMouseMove = 0;
+        //     arrAddress.forEach(function(e) {
+        //         /// Send data to Select Tag
+        //         let cityCode = $("#" + e + " #f_city").val();
+        //         district_fetch(cityCode, e, _token);
 
-                /// Select Item in Select Tag
-                let districtCode = $("#hidden_" + e + "_district_code").val();
-                if (districtCode != "") {
-                    document.querySelector('.container').addEventListener('mousemove', function() {
-                        changeSelectedDistrict(startMouseMove, e, districtCode);
-                    });
-                }
-            });
+        //         /// Select Item in Select Tag
+        //         // let districtCode = $("#hidden_" + e + "_district_code").val();
+        //         // if ($("#hidden_add1_district_code").val() !== "") {
+        //         //     document.querySelector('.container').addEventListener('mousemove', function() {
+        //         //         changeSelectedDistrict(startMouseMove, e, districtCode);
+        //         //     });
+        //         // }
+        //     });
 
-        })
+        // })
 
-        /// Fetch Commune in Page Edit.
-        $(document).ready(function() {
-            const arrAddress = ["add1", "add2"];
-            let startMouseMove = 0;
-            arrAddress.forEach(function(e) {
-                /// Send data to Select Tag
-                let cityCode = $("#" + e + " #hidden_" + e + "_district_code").val();
-                commune_fetch(cityCode, e, _token);
-
-                /// Select Item in Select Tag
-                let districtCode = $("#hidden_add1_commune_code").val();
-                if (districtCode != "") {
-                    document.querySelector('.container').addEventListener('mousemove', function() {
-                        changeSelectedCommune(startMouseMove, e, districtCode);
-                    });
-                }
-            });
-            $("#hidden_add1_district_code").val("");
-            $("#hidden_add1_commune_code").val("");
-        })
-
+        // /// Fetch Commune in Page Edit.
+        // $(document).ready(function() {
+        //     const arrAddress = ["add1", "add2"];
+        //     let startMouseMove = 0;
+        //     console.log("🚀 ~ file: index.blade.php ~ line 207 ~ $ ~ startMouseMove : ", startMouseMove)
+        //     arrAddress.forEach(function(e) {
+        //         /// Send data to Select Tag
+        //         let cityCode = $("#" + e + " #hidden_" + e + "_district_code").val();
+        //         commune_fetch(cityCode, e, _token);
+        //         /// Select Item in Select Tag
+        //         // let districtCode = $("#hidden_add1_commune_code").val();
+        //         // console.log("🚀 ~ file: index.blade.php ~ line 210 ~ arrAddress.forEach ~ districtCode",
+        //         //     districtCode);
+        //         // if ($("#hidden_add1_commune_code").val() !== "") {
+        //         //     document.querySelector('.container').addEventListener('mousemove', function() {
+        //         //         changeSelectedCommune(startMouseMove, e, districtCode);
+        //         //     });
+        //         // }
+        //     });
+        //     $("#hidden_add1_district_code").val("");
+        //     $("#hidden_add1_commune_code").val("");
+        // })
     </script>
 
 
