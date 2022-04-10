@@ -18,4 +18,4 @@ Route::get('/', function () {
 });
 
 Route::get("/", [\App\Http\Controllers\AddressController::class, "index"])->name("index");
-Route::post("/fetch", [\App\Http\Controllers\AddressController::class, "city_fetch"])->name("address.fetch");
+Route::get("/fetch/", [\App\Http\Controllers\AddressController::class, "city_fetch"])->name("address.fetch");

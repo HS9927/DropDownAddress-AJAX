@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 /// Model
 use App\Models\Address;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 
 class AddressController extends Controller
 {
@@ -19,21 +20,26 @@ class AddressController extends Controller
 
         $cities = DB::select($query);
 
+//        dd($cities);
+
         return view("index")
             ->with("cities", $cities);
     }
 
     public function city_fetch (Request $request)
     {
-        $code = $request->code;
-        // $query = "
-        //     SELECT DISTINCT district_code, district_name_en
-        //     FROM address
-        //     WHERE SUBSTRING(district_code, 1, 2) = ".$code.";
-        // ";
+        $code = $request->cityCode;
 
-        // return response()->json(array("msg" => "It Work !"), 200);
-        return response()->json(['success'=>'Data is successfully added']);
-        // return $code;
+        $query = "
+            SELECT DISTINCT district_code, district_name_en
+            FROM address
+            WHERE SUBSTRING(district_code, 1, 2) = ?;
+        ";
+
+       $cities = DB::select($query, [$code]);
+
+       return Response()->json(["cities" => $cities]);
+        // echo "Success";
+        // echo $city;
     }
 }
